@@ -28,9 +28,7 @@ public class SavingsAccount implements IBankAccount {
         return balance;
     }
     public void monthlyProcessing() {
-        if (balance>500.00) {
             balance += (balance*.03);
-        }
     }
     public String getAccountType() {
         return accountType;

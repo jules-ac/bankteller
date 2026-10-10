@@ -27,9 +27,7 @@ public class CheckingAccount implements IBankAccount {
         return balance;
     }
     public void monthlyProcessing() {
-        if (balance<200.00) {
             balance -= (balance*.03);
-        }
     }
     public String getAccountType() {
         return accountType;
