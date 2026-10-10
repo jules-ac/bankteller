@@ -10,25 +10,25 @@ public class CheckingAccount implements IBankAccount {
     public CheckingAccount(String username, String password, double amount) {
         this.username = username;
         this.password = password;
-        balance = amount;
+        balance += Math.floor(amount*100)/100;
     }
     public void deposit(double amount) {
-        balance += amount;
+        balance += Math.floor(amount*100)/100;
     }
     public void withdrawal(double amount) throws InsufficientFundsException {
         if (amount>balance) {
             throw new InsufficientFundsException();
         }
         else {
-            balance -= amount;
+            balance -= Math.floor(amount*100)/100;
         }
     }
     public double checkBalance() {
         return balance;
     }
     public void monthlyProcessing() {
-        if (balance>200.00) {
-            balance -= (balance*0.03);
+        if (balance<200.00) {
+            balance -= (balance*.03);
         }
     }
     public String getAccountType() {

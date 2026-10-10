@@ -3,10 +3,12 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.io.File;
 import java.util.ArrayList;
+import java.io.FileWriter;
+import java.io.IOException;
 public class BankTeller {
 
 
-    public static int accountIndex(String username, ArrayList<IBankAccount> arr) {
+    public static int getUserIndex(String username, ArrayList<IBankAccount> arr) {
         int index = 0;
         for (int i=0;i<arr.size();i++) {
             if ((arr.get(i)).getUsername().equals(username)) {
@@ -48,6 +50,83 @@ public class BankTeller {
             arr.add(new SavingsAccount(username, password, balance));
         }
     }
+
+    public static String login(Scanner scan, ArrayList<IBankAccount> arr) {
+
+
+        String username = "";
+        String password = "";
+
+        while (true) {
+
+            System.out.println("\nLogin (enter 0 to quit)\n");
+            System.out.print("Username: ");
+            username = scan.next();
+            if (username.equals("0")) {
+                break;
+            }
+            if (!usernameExists(username, arr)) {
+                System.out.println("Account with specified username does not exist.");
+                continue;
+            }
+            int chances = 3;
+
+            while (true) {
+                System.out.print("Password: ");
+                password = scan.next();
+                if (!passwordMatches(username, password, arr)) {
+                    System.out.println("\nPassword incorrect.");
+                    if (chances>1) {
+                        chances--;
+                        continue;
+                    } else {
+                        System.out.println("\nToo many incorrect guesses. Restarting login.");
+                        break;
+                    }
+                } else { return username; }
+            }
+        }
+        return username;
+    }
+
+    public static void teller(Scanner scan, String currUser, ArrayList<IBankAccount> arr) {
+
+        int userIndex = getUserIndex(currUser, arr);
+        while (true) {
+            System.out.println("\nChoose an Action");
+            System.out.print("1 - View balance\n2 - Deposit amount\n3 - Withdraw amount\n0 - Quit\n--> ");
+            int choice = scan.nextInt();
+            switch (choice) {
+                case 1:
+                    System.out.println((arr.get(userIndex)).checkBalance());
+                    break;
+                case 2:
+                    System.out.print("Enter amount to deposit: ");
+                    arr.get(userIndex).deposit(scan.nextDouble());
+                    break;
+                case 3:
+                    System.out.print("Enter amount to withdraw: ");
+                    arr.get(userIndex).withdrawal(scan.nextDouble());
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println("Invalid choice");
+            }
+        }
+    }
+
+    public static void updateFile(FileWriter writer, ArrayList<IBankAccount> arr) throws IOException {
+
+        for (int i=0;i<arr.size();i++) {
+            writer.write(arr.get(i).getUsername() + " " + arr.get(i).getPassword() + " " + arr.get(i).getAccountType() + " " + arr.get(i).checkBalance());
+            if (i!=arr.size()-1) {
+                writer.write("\n");
+            }
+        }
+
+    }
+
     public static void main(String[] args) throws FileNotFoundException {
 
         ArrayList<IBankAccount> accounts = new ArrayList<IBankAccount>();
@@ -62,41 +141,20 @@ public class BankTeller {
 
         System.out.println(" . - = Juliaville Bank = - . ");
 
-        System.out.print("Login\nUsername: ");
-        String username = userScan.next();
+        String currentUser = login(userScan, accounts);
 
-        if (!usernameExists(username, accounts)) {
-            System.out.println("Account with specified username does not exist.");
+        if (!currentUser.equals("0")) {
+            teller(userScan, currentUser, accounts);
         }
 
-        System.out.print("\nPassword: ");
-        String password = userScan.next();
-
-        if (!passwordMatches(username, password, accounts)) {
-            System.out.println("Incorrect password.");
+        try {
+            FileWriter writer = new FileWriter("records.txt");
+            updateFile(writer, accounts);
+            writer.close();
+        }
+        catch (IOException e) {
+            System.out.println("Output file could not be accessed");
         }
 
-        System.out.println("\nChoose an Action");
-        System.out.print("1 - View balance\n2 - Deposit amount\n3 - Withdraw amount");
-        int choice = userScan.nextInt();
-
-        int userIndex = accountIndex(username, accounts);
-
-        switch(choice) {
-            case 1:
-                System.out.println((accounts.get(userIndex)).checkBalance());
-                break;
-            case 2:
-                System.out.print("Enter amount to deposit: ");
-                accounts.get(userIndex).deposit(userScan.nextDouble());
-                break;
-            case 3:
-                System.out.print("Enter amount to withdraw: ");
-                accounts.get(userIndex).withdrawal(userScan.nextDouble());
-                break;
-            default:
-                System.out.println("Invalid choice");
-        }
     }
-
 }

@@ -10,18 +10,18 @@ public class SavingsAccount implements IBankAccount {
     public SavingsAccount(String username, String password, double amount) {
         this.username = username;
         this.password = password;
-        balance = amount;
+        balance = Math.floor(amount*100)/100;
     }
 
     public void deposit(double amount) {
-        balance += amount;
+        balance += Math.floor(amount*100)/100;
     }
     public void withdrawal(double amount) throws InsufficientFundsException {
         if (amount>balance) {
             throw new InsufficientFundsException();
         }
         else {
-            balance -= amount;
+            balance -= Math.floor(amount*100)/100;
         }
     }
     public double checkBalance() {
