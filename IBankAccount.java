@@ -1,3 +1,7 @@
+// Julia Conti
+// CSC 102
+// 10/13/2026
+
 package lab4;
 
 public interface IBankAccount {
